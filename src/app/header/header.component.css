@@ -1,0 +1,22 @@
+.toolbar {
+  background-color: #1976D2;
+  color: white;
+  font-weight: 600;
+}
+
+.dropdown-toolbar {
+  background-color: #1976D2;
+}
+
+.bg-blue-perso {
+  background-color: #1976D2;
+}
+.bg-blue-perso-item:hover {
+  background-color: rgb(14, 72, 129)!important;
+}
+
+
+
+
+
+
