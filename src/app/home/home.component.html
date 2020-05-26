@@ -1,1 +1,36 @@
-<p>home works!</p>
+<div class="container-fluide mt-1">
+  <div class="row">
+    <div class="col-12 d-flex">
+      <button class="btn btn-primary mx-auto" type="button" data-toggle="modal" data-target="#listFormModal">
+        <span><i class="fas fa-plus"></i> Ajouter une liste</span> </button>
+    </div>
+  </div>
+  <hr class="mt-1 mb-5 bg-dark">
+  <div class="row">
+
+  </div>
+</div>
+
+<div class="modal fade" id="listFormModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Ajouter une liste</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" placeholder="Titre" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-primary">Ajouter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
