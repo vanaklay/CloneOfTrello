@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
@@ -7,9 +8,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  listForm: FormGroup;
+  constructor(
+    private formBuilder: FormBuilder
+  ) { }
 
   ngOnInit(): void {
+    this.initListForm();
+  }
+
+  initListForm() {
+    this.listForm = this.formBuilder.group({
+      title: ['', [Validators.required, Validators.maxLength(50)]]
+    });
+  }
+
+  onSubmitListForm(){
+    console.log(this.listForm.value);
   }
 
 }
