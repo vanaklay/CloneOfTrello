@@ -17,13 +17,20 @@ export class ListService {
 
   listOfTask: any[] = [
     {
-      title: 'Create HomePage'
+      title: 'Create HomePage',
+      id: 0
     },
     {
-      title: 'Authentication'
+      title: 'Authentication',
+      id: 1
     },
     {
-      title: 'WorkPage'
+      title: 'WorkPage',
+      id: 0
+    },
+    {
+      title: 'CRUD list',
+      id: 1
     }
   ];
 
@@ -39,9 +46,21 @@ export class ListService {
 
   createList(list) {
     this.listOfList.push(list);
+    this.emitList();
   }
 
   createListOfTask(task) {
     this.listOfTask.push(task);
+    this.emitList();
+  }
+
+  deleteTask(index) {
+    this.listOfTask.splice(index, 1);
+    this.emitList();
+  }
+
+  updateListOfTask(task, index) {
+    this.listOfTask[index] = task;
+    this.emitList();
   }
 }
