@@ -8,7 +8,8 @@
   <div class="collapse navbar-collapse dropdown-toolbar" id="navbarSupportedContent">
     <ul class="navbar-nav ml-auto pl-3 pr-3">
       <li class="nav-item">
-        <a class="nav-link text-white" href="#">Connexion</a>
+        <a class="nav-link text-white" href="/login" *ngIf="!isLogged">Connexion</a>
+        <a class="nav-link text-white" href="/login" (click)="onSignOut()" *ngIf="isLogged" >Deconnexion</a>
       </li>
     </ul>
   </div>

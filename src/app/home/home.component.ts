@@ -14,7 +14,9 @@ export class HomeComponent implements OnInit {
   listForm: FormGroup;
   listSubscription: Subscription;
   listOfList: any[] = [];
+  listId;
   listIndexToCreate;
+  isListEmpty = true;
 
   taskForm: FormGroup;
   taskSubsciption: Subscription;
@@ -41,62 +43,92 @@ export class HomeComponent implements OnInit {
         this.taskList = data;
       }
     );
+    this.listService.getLists();
+    this.listService.getTask();
     this.listService.emitList();
   }
 
+  // Lists
   initListForm() {
     this.listForm = this.formBuilder.group({
-      title: ['', [Validators.required, Validators.maxLength(30)]]
+      title: ['', [Validators.required, Validators.maxLength(30)]],
+      id: ''
     });
   }
 
-  initTaskForm() {
-    this.taskForm = this.formBuilder.group({
-      title: ['', Validators.required],
-      id: ''
-    })
+  onReset() {
+    this.listId = null;
+    this.listForm.reset();
   }
 
   onSubmitListForm(){
     this.updateMode = false;
-    const newList = this.listForm.value;
+    let uniqueId = Date.now() + this.listOfList.length;
+    const newList = {
+      title: this.listForm.get('title').value,
+      id: uniqueId
+    }
     this.listService.createList(newList);
     $('#listFormModal').modal('hide');
   }
 
-  addTask(index) {
+  onDeleteList(id){
+    $('#deleteListModal').modal('show');
+    this.isListEmpty = this.countTaskOnList(id);
+    console.log('value of isEmpty',this.isListEmpty);
+    this.listId = id;
+  }
+  onConfirmDeleteList() {
+    this.listService.deleteList(this.listId);
+    $('#deleteListModal').modal('hide');
+  }
+
+  countTaskOnList(id){
+    let count = 0;
+    this.taskList.forEach(task => {
+      if (id === task.listId) {
+        count++;
+      }
+    });
+    if (count > 0) {
+      return false;
+    } else { return true }
+  }
+
+
+
+  // Tasks
+  initTaskForm() {
+    this.taskForm = this.formBuilder.group({
+      title: ['', Validators.required],
+      id: '',
+      listId: ''
+    })
+  }
+
+  addTask(id) {
     this.updateMode = false;
     $('#taskFormModal').modal('show');
     this.taskForm.reset();
-    this.listIndexToCreate = index;
+    this.listId = id;
   }
-
-
 
   onSubmitTaskForm(){
+    let uniqueTaskId = Date.now() + this.listOfList.length;
     const newTask = {
       title: this.taskForm.value.title,
-      id: this.listIndexToCreate
+      id: uniqueTaskId,
+      listId: this.listId
     };
     if (this.updateMode) {
-      const newTask = {
+      const updatedTask = {
         title: this.taskForm.value.title,
-        id: this.taskForm.value.id
-      };
-      this.listService.updateListOfTask(newTask, this.taskIndexToUpdate);
+        id: this.taskForm.value.id,
+        listId: this.taskForm.value.listId
+      }
+      this.listService.updateListOfTask(updatedTask, this.taskIndexToUpdate);
     } else { this.listService.createListOfTask(newTask); }
     $('#taskFormModal').modal('hide');
-  }
-
-
-  onDeleteTask(index){
-    $('#deleteTaskModal').modal('show');
-    this.taskIndexToRemove = index;
-  }
-
-  onConfirmDeleteTask(){
-    this.listService.deleteTask(this.taskIndexToRemove);
-    $('#deleteTaskModal').modal('hide');
   }
 
   onEditTask(task) {
@@ -104,6 +136,7 @@ export class HomeComponent implements OnInit {
     $('#taskFormModal').modal('show');
     this.taskForm.get('title').setValue(task.title);
     this.taskForm.get('id').setValue(task.id);
+    this.taskForm.get('listId').setValue(task.listId);
     const index = this.taskList.findIndex(
       (taskEl) => {
         if (taskEl === task) {
@@ -113,4 +146,24 @@ export class HomeComponent implements OnInit {
     );
     this.taskIndexToUpdate = index;
   }
+
+  onDeleteTask(id){
+    $('#deleteTaskModal').modal('show');
+    const index = this.taskList.findIndex(
+      (elt) => {
+        if (elt.id == id){
+          return true;
+        }
+      }
+    );
+    this.taskIndexToRemove = index;
+  }
+
+  onConfirmDeleteTask(){
+    this.listService.deleteTask(this.taskIndexToRemove);
+    this.listService.getTask();
+    $('#deleteTaskModal').modal('hide');
+  }
+
+
 }

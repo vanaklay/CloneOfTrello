@@ -1,115 +1,146 @@
-<div class="container-fluide" style="background-color: #0279BF;height: 100vh;">
-  <div class="row pt-3 pb-3">
-    <div class="col-12 d-flex">
-      <button class="btn btn-light mx-auto" type="button" data-toggle="modal" data-target="#listFormModal">
-        <span><i class="fas fa-plus"></i> Ajouter une liste</span> </button>
-    </div>
-  </div>
-  <hr class="mt-1 mb-5 bg-dark">
-  <div class="row mt-5">
-    <!-- List Start -->
-    <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listOfList; let x = index">
-      <div class="card m-1 mx-auto" style="background-color: #EBECF0;">
-        <div class="card-body">
-          <h4 class="card-title">{{ item.title }}</h4>
-          <hr class="mt-1 mb-1 bg-dark">
-          <!-- Task Start -->
-          <div class="row mt-1 mb-1 p-0" *ngFor="let task of taskList; let i = index">
-            <div class="card m-1" style="width: 100%;" *ngIf="task.id == x">
-              <div class="card-body p-0">
-                <div class="col-12">
-                  <h5 class="card-texte m-0 mt-1">{{ task.title }}</h5>
-                </div>
-                  <div class="d-flex">
-                    <div class="ml-auto">
-                      <button class="btn btn-light m-1" type="button" (click)="onEditTask(task)">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-light m-1" type="button" (click)="onDeleteTask(i)">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </div>
-                  </div>
-              </div>
-            </div>
-          </div>
-          <!-- Task End -->
-          <button class="btn btn-light" type="button" (click)="addTask(x)">
-            <span><i class="fas fa-plus"></i> Ajouter une tâche</span>
-          </button>
+<section>
 
-        </div>
+  <div class="container-fluide" style="background-color: #0279BF;height: 100vh;">
+    <div class="row pt-3 pb-3">
+      <div class="col-12 d-flex">
+        <button class="btn btn-light mx-auto" type="button" data-toggle="modal" data-target="#listFormModal" (click)="onReset()">
+          <span><i class="fas fa-plus"></i> Ajouter une liste</span> </button>
       </div>
     </div>
-    <!-- List End -->
-  </div>
-</div>
+    <hr class="mt-1 mb-5 bg-dark">
+    <div class="row mt-5">
+      <!-- List Start -->
+      <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listOfList">
+        <div class="card m-1 mx-auto" style="background-color: #EBECF0;">
+          <div class="card-body">
+            <h4 class="card-title">{{ item.title }}</h4>
+            <hr class="mt-1 mb-1 bg-dark">
+            <!-- Task Start -->
+            <div class="row mt-1 mb-1 p-0" *ngFor="let task of taskList">
+              <div class="card m-1" style="width: 100%;" *ngIf="task.listId == item.id">
+                <div class="card-body p-0">
+                  <div class="col-12">
+                    <h5 class="card-texte m-0 mt-1">{{ task.title }}</h5>
+                  </div>
+                    <div class="d-flex">
+                      <div class="ml-auto">
+                        <button class="btn btn-light m-1" type="button" (click)="onEditTask(task)">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-light m-1" type="button" (click)="onDeleteTask(task.id)">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <!-- Task End -->
+            <div class="d-flex">
+              <button class="btn btn-light" type="button" (click)="addTask(item.id)">
+                <span><i class="fas fa-plus"></i> Ajouter une tâche</span>
+              </button>
+              <button class="btn btn-light m-1 ml-auto" type="button" (click)="onDeleteList(item.id)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
 
-<!--MODALS PART -->
-<!-- Add new list Modal -->
-<div class="modal fade" id="listFormModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form [formGroup]="listForm" (ngSubmit)="onSubmitListForm()">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Ajouter une liste</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <input type="text" placeholder="Titre" class="form-control" formControlName="title">
+
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-          <button class="btn btn-primary" type="submit" [disabled]="listForm.invalid">Ajouter</button>
-        </div>
-      </form>
+      </div>
+      <!-- List End -->
     </div>
   </div>
-</div>
 
-<!-- Add new task Modal -->
-<div class="modal fade" id="taskFormModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form [formGroup]="taskForm" (ngSubmit)="onSubmitTaskForm()">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Edition d'une tâche</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <textarea type="text" placeholder="Titre" class="form-control" formControlName="title"></textarea>
+  <!--MODALS PART -->
+  <!--MODALS LIST PART -->
+  <!-- Add new list Modal -->
+  <div class="modal fade" id="listFormModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form [formGroup]="listForm" (ngSubmit)="onSubmitListForm()">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Ajouter une liste</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-          <button class="btn btn-primary" type="submit" [disabled]="taskForm.invalid">Ajouter</button>
-        </div>
-      </form>
+          <div class="modal-body">
+            <div class="form-group">
+              <input type="text" placeholder="Titre" class="form-control" formControlName="title">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+            <button class="btn btn-primary" type="submit" [disabled]="listForm.invalid">Ajouter</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Confirm Modal -->
-<div class="modal fade" id="deleteTaskModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Supprimer la tâche ?</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-          <button type="button" class="btn btn-danger"(click)="onConfirmDeleteTask()">Supprimer</button>
-        </div>
+  <!-- Confirm Modal -->
+  <div class="modal fade" id="deleteListModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Supprimer la liste ?</h5>
+
+          </div>
+          <div class="modal-body" *ngIf="!isListEmpty">
+            <p style="color: red;">Vous ne pouvez pas supprimer une liste non vide.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-danger"(click)="onConfirmDeleteList()" *ngIf="isListEmpty">Supprimer</button>
+          </div>
+      </div>
     </div>
   </div>
-</div>
+  <!--MODALS LIST END -->
+  <!--MODALS TASK -->
+  <!-- Add new task Modal -->
+  <div class="modal fade" id="taskFormModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form [formGroup]="taskForm" (ngSubmit)="onSubmitTaskForm()">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Edition d'une tâche</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <textarea type="text" placeholder="Titre" class="form-control" formControlName="title"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+            <button class="btn btn-primary" type="submit" [disabled]="taskForm.invalid">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal fade" id="deleteTaskModal" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Supprimer la tâche ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-danger"(click)="onConfirmDeleteTask()">Supprimer</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+
