@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import * as firebase from 'firebase';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
@@ -11,12 +12,13 @@ import * as firebase from 'firebase';
 export class SignupComponent implements OnInit {
 
   signupForm: FormGroup;
-  signUpSuccess = false;
-  trySignUp = false;
+  signUpFailed = false;
+  emailAlreadyUse = false;
   isLogged = false;
   constructor(
     private formBuilder: FormBuilder,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -29,8 +31,6 @@ export class SignupComponent implements OnInit {
         }
       }
     );
-    this.signUpSuccess = false;
-    this.trySignUp = false;
     this.initSignUp();
   }
 
@@ -44,14 +44,17 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmitSignUp(){
-    this.trySignUp = true;
     const email = this.signupForm.get('email').value;
     const password = this.signupForm.get('password').value;
     this.authService.signUpUser(email, password).then( () => {
-      console.log('User created successfully');
-      this.signUpSuccess = true;
+      this.router.navigate(['/home']);
       }).catch((error) => {
       console.log(error);
+      if( error.code == 'auth/email-already-in-use') {
+        this.emailAlreadyUse = true;
+      } else {
+        this.signUpFailed = true;
+      }
     })
   }
 

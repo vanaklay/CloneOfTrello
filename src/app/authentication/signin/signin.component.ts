@@ -13,6 +13,9 @@ export class SigninComponent implements OnInit {
 
   signinForm: FormGroup;
   isLogged = false;
+  noUserRecord = false;
+  wrongPassword = false;
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -47,7 +50,11 @@ export class SigninComponent implements OnInit {
       // console.log(data['user']['uid']);
       this.router.navigate(['/home']);
     }).catch((error) => {
-      console.log(error);
+      if(error.code == 'auth/user-not-found') {
+        this.noUserRecord = true;
+      } else if (error.code == 'auth/wrong-password') {
+        this.wrongPassword = true;
+      }
     });
   }
 

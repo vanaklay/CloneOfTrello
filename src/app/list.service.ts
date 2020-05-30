@@ -9,11 +9,9 @@ import * as firebase from 'firebase';
 export class ListService {
 
   listOfList: any[] = [];
-  listByUser: any[] = [];
   listOfTask: any[] = [];
 
   listSubject = new Subject<any[]>();
-  userSubject = new Subject<any[]>();
   taskSubject = new Subject<any[]>();
 
   constructor() { }
@@ -21,48 +19,36 @@ export class ListService {
   emitList(){
     this.listSubject.next(this.listOfList);
     this.taskSubject.next(this.listOfTask);
-    this.userSubject.next(this.listByUser);
 
   }
   // lists
-  createList(list) {
+  createList(list, userId) {
     this.listOfList.push(list);
-    this.saveLists();
+    this.saveLists(userId);
     this.emitList();
   }
 
-  saveLists() {
-    firebase.database().ref('/lists').set(this.listOfList);
+  saveLists(userId: string) {
+    firebase.database().ref('/' + userId).set(this.listOfList);
   }
 
   getLists() {
-    firebase.database().ref('/lists').on('value', (data) => {
-      this.listOfList = data.val() ? data.val() : [];
-      this.emitList();
-    });
-  }
-
-  getListById() {
     firebase.auth().onAuthStateChanged(
       (userSession) => {
-        if (userSession) {
-          firebase.database().ref('/lists/').on('value', (data) => {
-            data.val().forEach(element => {
-              if(element.userId === userSession.uid) {
-                this.listByUser.push(element);
-              }
-            })
+        if(userSession) {
+          firebase.database().ref('/' + userSession.uid).on('value', (data) => {
+            this.listOfList = data.val() ? data.val() : [];
             this.emitList();
           });
-        } else {
-          console.log('User not connected');
         }
       }
     );
 
   }
 
-  deleteList(id) {
+
+
+  deleteList(id, userId) {
     const index = this.listOfList.findIndex(
       (elt) => {
         if (elt['id'] === id) {
@@ -71,7 +57,7 @@ export class ListService {
       }
     );
     this.listOfList.splice(index, 1);
-    this.saveLists();
+    this.saveLists(userId);
     this.emitList();
   }
 

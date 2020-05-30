@@ -31,7 +31,6 @@ export class HomeComponent implements OnInit {
   // auth properties
   isLogged = false;
   userId;
-  userSubscription: Subscription;
   listByUser: any[] = [];
 
   constructor(
@@ -64,15 +63,9 @@ export class HomeComponent implements OnInit {
         this.taskList = data;
       }
     );
-    this.userSubscription = this.listService.userSubject.subscribe(
-      (data: any) => {
-        this.listByUser = data;
-      }
-    );
     this.listService.getLists();
-    this.listService.getListById();
     this.listService.getTask();
-    this.listService.emitList();
+    // this.listService.emitList();
   }
 
   // Lists
@@ -80,7 +73,6 @@ export class HomeComponent implements OnInit {
     this.listForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.maxLength(30)]],
       id: '',
-      userId: ''
     });
   }
 
@@ -94,21 +86,19 @@ export class HomeComponent implements OnInit {
     let uniqueId = Date.now() + this.listOfList.length;
     const newList = {
       title: this.listForm.get('title').value,
-      id: uniqueId,
-      userId: this.userId
+      id: uniqueId
     }
-    this.listService.createList(newList);
+    this.listService.createList(newList, this.userId);
     $('#listFormModal').modal('hide');
   }
 
   onDeleteList(id){
     $('#deleteListModal').modal('show');
     this.isListEmpty = this.countTaskOnList(id);
-    console.log('value of isEmpty',this.isListEmpty);
     this.listId = id;
   }
   onConfirmDeleteList() {
-    this.listService.deleteList(this.listId);
+    this.listService.deleteList(this.listId, this.userId);
     $('#deleteListModal').modal('hide');
   }
 

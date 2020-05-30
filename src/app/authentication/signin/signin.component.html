@@ -1,13 +1,20 @@
-<section *ngIf="isLogged">
-  <app-sign></app-sign>
-</section>
+
 <section *ngIf="!isLogged">
   <div class="container">
     <h2 class="display-4 mt-5 mb-5 text-center">Se connecter à TrelloClone</h2>
 
     <div class="row">
       <div class="col-sm-10 col-md-6 col-lg-4 mx-auto rounded shadow p-5">
-        <form [formGroup]="signinForm" (ngSubmit)="onSubmitSignIn()">
+        <div class="text-center" *ngIf="noUserRecord">
+          <span  style="color: red;">Il y a une erreur dans l'adresse email.</span><br/>
+          <span class="bottom-form-link"><a href="#">Réessayer</a></span>
+        </div>
+        <div class="text-center" *ngIf="wrongPassword">
+          <span  style="color: red;">Il y a une erreur dans le mot de passe.</span><br/>
+          <span class="bottom-form-link"><a href="#">Réessayer</a></span>
+        </div>
+
+        <form [formGroup]="signinForm" (ngSubmit)="onSubmitSignIn()" *ngIf="!noUserRecord && !wrongPassword">
           <div class="form-group">
             <label for="email">Adresse email</label>
             <input type="email" id=email class="form-control" placeholder="example@email.com" formControlName="email">
@@ -25,4 +32,7 @@
       </div>
     </div>
   </div>
+</section>
+<section *ngIf="isLogged">
+  <app-sign></app-sign>
 </section>

@@ -1,7 +1,5 @@
 
-<section *ngIf="!isLogged">
-<app-signin></app-signin>
-</section>
+
 <section *ngIf="isLogged">
 
   <div class="container-fluide" style="background-color: #0279BF;height: 100vh;">
@@ -14,7 +12,7 @@
     <hr class="mt-1 mb-5 bg-dark">
     <div class="row mt-5">
       <!-- List Start -->
-      <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listByUser">
+      <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listOfList">
         <div class="card m-1 mx-auto" style="background-color: #EBECF0;">
           <div class="card-body">
             <h4 class="card-title">{{ item.title }}</h4>
@@ -147,4 +145,6 @@
     </div>
   </div>
 </section>
-
+<section *ngIf="!isLogged">
+  <app-signin></app-signin>
+  </section>
