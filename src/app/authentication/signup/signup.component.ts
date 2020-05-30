@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import * as firebase from 'firebase';
 
 @Component({
   selector: 'app-signup',
@@ -12,12 +13,22 @@ export class SignupComponent implements OnInit {
   signupForm: FormGroup;
   signUpSuccess = false;
   trySignUp = false;
+  isLogged = false;
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthenticationService
   ) { }
 
   ngOnInit(): void {
+    firebase.auth().onAuthStateChanged(
+      (userSession) => {
+        if (userSession) {
+          this.isLogged = true;
+        } else {
+          this.isLogged = false;
+        }
+      }
+    );
     this.signUpSuccess = false;
     this.trySignUp = false;
     this.initSignUp();

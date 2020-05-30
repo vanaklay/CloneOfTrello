@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators, NgForm } from '@angular/forms';
 import { ListService } from '../list.service';
 import { Subscription } from 'rxjs';
 import * as $ from 'jquery';
+import * as firebase from 'firebase';
 
 @Component({
   selector: 'app-home',
@@ -11,6 +12,7 @@ import * as $ from 'jquery';
 })
 export class HomeComponent implements OnInit {
 
+  // list properties
   listForm: FormGroup;
   listSubscription: Subscription;
   listOfList: any[] = [];
@@ -18,6 +20,7 @@ export class HomeComponent implements OnInit {
   listIndexToCreate;
   isListEmpty = true;
 
+  // task properties
   taskForm: FormGroup;
   taskSubsciption: Subscription;
   taskList: any[] = [];
@@ -25,12 +28,29 @@ export class HomeComponent implements OnInit {
   taskIndexToUpdate;
   updateMode = false;
 
+  // auth properties
+  isLogged = false;
+  userId;
+  userSubscription: Subscription;
+  listByUser: any[] = [];
+
   constructor(
     private formBuilder: FormBuilder,
     private listService: ListService
   ) { }
 
   ngOnInit(): void {
+    firebase.auth().onAuthStateChanged(
+      (userSession) => {
+        if (userSession) {
+          this.isLogged = true;
+          this.userId = userSession.uid;
+        } else {
+          this.isLogged = false;
+          this.userId = '';
+        }
+      }
+    );
     this.initListForm();
     this.initTaskForm();
     this.listSubscription = this.listService.listSubject.subscribe(
@@ -38,12 +58,19 @@ export class HomeComponent implements OnInit {
         this.listOfList = data;
       }
     );
+
     this.taskSubsciption = this.listService.taskSubject.subscribe(
       (data: any) => {
         this.taskList = data;
       }
     );
+    this.userSubscription = this.listService.userSubject.subscribe(
+      (data: any) => {
+        this.listByUser = data;
+      }
+    );
     this.listService.getLists();
+    this.listService.getListById();
     this.listService.getTask();
     this.listService.emitList();
   }
@@ -52,7 +79,8 @@ export class HomeComponent implements OnInit {
   initListForm() {
     this.listForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.maxLength(30)]],
-      id: ''
+      id: '',
+      userId: ''
     });
   }
 
@@ -66,7 +94,8 @@ export class HomeComponent implements OnInit {
     let uniqueId = Date.now() + this.listOfList.length;
     const newList = {
       title: this.listForm.get('title').value,
-      id: uniqueId
+      id: uniqueId,
+      userId: this.userId
     }
     this.listService.createList(newList);
     $('#listFormModal').modal('hide');

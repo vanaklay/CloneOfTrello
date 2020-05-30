@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '../services/authentication.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import * as firebase from 'firebase';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  selector: 'app-sign',
+  templateUrl: './sign.component.html',
+  styleUrls: ['./sign.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class SignComponent implements OnInit {
 
-  isLogged = false;
+  email = '';
   constructor(
     private authService: AuthenticationService,
   ) { }
@@ -17,17 +17,16 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     firebase.auth().onAuthStateChanged(
       (userSession) => {
-        if (userSession) {
-          this.isLogged = true;
+        if(userSession) {
+          this.email = userSession.email;
         } else {
-          this.isLogged = false;
+          this.email = '';
         }
+
       }
     );
   }
-
   onSignOut(){
     this.authService.signOutUser();
   }
-
 }

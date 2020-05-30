@@ -1,4 +1,8 @@
-<section>
+
+<section *ngIf="!isLogged">
+<app-signin></app-signin>
+</section>
+<section *ngIf="isLogged">
 
   <div class="container-fluide" style="background-color: #0279BF;height: 100vh;">
     <div class="row pt-3 pb-3">
@@ -10,7 +14,7 @@
     <hr class="mt-1 mb-5 bg-dark">
     <div class="row mt-5">
       <!-- List Start -->
-      <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listOfList">
+      <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listByUser">
         <div class="card m-1 mx-auto" style="background-color: #EBECF0;">
           <div class="card-body">
             <h4 class="card-title">{{ item.title }}</h4>
@@ -36,7 +40,7 @@
               </div>
             </div>
             <!-- Task End -->
-            <div class="d-flex">
+            <div class="d-flex" >
               <button class="btn btn-light" type="button" (click)="addTask(item.id)">
                 <span><i class="fas fa-plus"></i> Ajouter une tâche</span>
               </button>

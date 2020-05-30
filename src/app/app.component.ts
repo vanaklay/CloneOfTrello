@@ -10,7 +10,7 @@ export class AppComponent {
 
   constructor() {
     const firebaseConfig = {
-      // paste here
+      // Paste here
     };
     firebase.initializeApp(firebaseConfig);
 

@@ -8,6 +8,7 @@ import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { SigninComponent } from './authentication/signin/signin.component';
 import { SignupComponent } from './authentication/signup/signup.component';
+import { SignComponent } from './authentication/sign/sign.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { SignupComponent } from './authentication/signup/signup.component';
     HeaderComponent,
     HomeComponent,
     SigninComponent,
-    SignupComponent
+    SignupComponent,
+    SignComponent
   ],
   imports: [
     BrowserModule,

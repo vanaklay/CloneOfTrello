@@ -1,0 +1,16 @@
+<div class="container">
+  <h2 class="display-4 mt-5 mb-5 text-center">Vous êtes déjà connecté</h2>
+
+  <div class="row">
+    <div class="col-sm-10 col-md-6 col-lg-4 mx-auto rounded shadow p-5">
+      <div class="mx-auto text-center">
+        <span class="bottom-form-link" >Vous êtes connecté avec cette adresse email</span>
+        <p>{{ email }}</p>
+      </div>
+      <hr class="mt-3 mb-1 bg-dark">
+      <div class="mx-auto text-center">
+        <span class="bottom-form-link" ><a href="/login" (click)="onSignOut()">Vous souhaitez vous déconnecter&nbsp;?</a></span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -8,35 +8,12 @@ import * as firebase from 'firebase';
 })
 export class ListService {
 
-  listOfList: any[] = [
-    // {
-    //   title: 'To do'
-    // },
-    // {
-    //   title: 'Work in Progress'
-    // }
-  ];
+  listOfList: any[] = [];
+  listByUser: any[] = [];
+  listOfTask: any[] = [];
 
-  listOfTask: any[] = [
-    // {
-    //   title: 'Create HomePage',
-    //   id: 0
-    // },
-    // {
-    //   title: 'Authentication',
-    //   id: 1
-    // },
-    // {
-    //   title: 'WorkPage',
-    //   id: 0
-    // },
-    // {
-    //   title: 'CRUD list',
-    //   id: 1
-    // }
-  ];
-
-  listSubject =  new Subject<any[]>();
+  listSubject = new Subject<any[]>();
+  userSubject = new Subject<any[]>();
   taskSubject = new Subject<any[]>();
 
   constructor() { }
@@ -44,6 +21,8 @@ export class ListService {
   emitList(){
     this.listSubject.next(this.listOfList);
     this.taskSubject.next(this.listOfTask);
+    this.userSubject.next(this.listByUser);
+
   }
   // lists
   createList(list) {
@@ -61,6 +40,26 @@ export class ListService {
       this.listOfList = data.val() ? data.val() : [];
       this.emitList();
     });
+  }
+
+  getListById() {
+    firebase.auth().onAuthStateChanged(
+      (userSession) => {
+        if (userSession) {
+          firebase.database().ref('/lists/').on('value', (data) => {
+            data.val().forEach(element => {
+              if(element.userId === userSession.uid) {
+                this.listByUser.push(element);
+              }
+            })
+            this.emitList();
+          });
+        } else {
+          console.log('User not connected');
+        }
+      }
+    );
+
   }
 
   deleteList(id) {
