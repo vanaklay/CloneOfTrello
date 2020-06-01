@@ -6,30 +6,32 @@
     <div class="row pt-3 pb-3">
       <div class="col-12 d-flex">
         <button class="btn btn-light mx-auto" type="button" data-toggle="modal" data-target="#listFormModal" (click)="onReset()">
-          <span><i class="fas fa-plus"></i> Ajouter une liste</span> </button>
+          <span><i class="fas fa-plus"></i> Ajouter une liste</span>
+        </button>
+        <!-- <button class="btn btn-light ml-auto" type="button" (click)="saveWork()">Sauvegarder</button> -->
       </div>
     </div>
     <hr class="mt-1 mb-5 bg-dark">
-    <div class="row mt-5">
+    <div class="row mt-5" cdkDropListGroup>
       <!-- List Start -->
-      <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listOfList">
+      <div class="col-sm-12 col-md-4 col-lg-3" *ngFor="let item of listOfList" cdkDropList [cdkDropListData]="item.tasks" (cdkDropListDropped)="onTaskDrop($event)">
         <div class="card m-1 mx-auto" style="background-color: #EBECF0;">
           <div class="card-body">
             <h4 class="card-title">{{ item.title }}</h4>
             <hr class="mt-1 mb-1 bg-dark">
             <!-- Task Start -->
-            <div class="row mt-1 mb-1 p-0" *ngFor="let task of taskList">
-              <div class="card m-1" style="width: 100%;" *ngIf="task.listId == item.id">
+            <div class="row mt-1 mb-1 p-0" *ngFor="let task of item.tasks" cdkDrag>
+              <div class="card m-1" style="width: 100%;">
                 <div class="card-body p-0">
                   <div class="col-12">
                     <h5 class="card-texte m-0 mt-1">{{ task.title }}</h5>
                   </div>
                     <div class="d-flex">
                       <div class="ml-auto">
-                        <button class="btn btn-light m-1" type="button" (click)="onEditTask(task)">
+                        <button class="btn btn-light m-1" type="button" (click)="onEditTask(task, item.id)">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-light m-1" type="button" (click)="onDeleteTask(task.id)">
+                      <button class="btn btn-light m-1" type="button" (click)="onDeleteTask(task.id, item.id)">
                         <i class="fas fa-trash-alt"></i>
                       </button>
                     </div>

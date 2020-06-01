@@ -4,6 +4,7 @@ import { ListService } from '../list.service';
 import { Subscription } from 'rxjs';
 import * as $ from 'jquery';
 import * as firebase from 'firebase';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-home',
@@ -16,26 +17,27 @@ export class HomeComponent implements OnInit {
   listForm: FormGroup;
   listSubscription: Subscription;
   listOfList: any[] = [];
-  listId;
-  listIndexToCreate;
-  isListEmpty = true;
+  listId: string;
+  listIdToUpdate: string;
+  listIdToDelete: string;
+  listIndexToCreate: string;
+  isListEmpty: boolean = true;
 
   // task properties
   taskForm: FormGroup;
-  taskSubsciption: Subscription;
-  taskList: any[] = [];
-  taskIndexToRemove;
-  taskIndexToUpdate;
-  updateMode = false;
+  taskIndexToRemove: string;
+  taskIndexToUpdate: string;
+  updateMode: boolean = false;
 
   // auth properties
-  isLogged = false;
-  userId;
+  isLogged: boolean = false;
+  userId: string;
   listByUser: any[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
-    private listService: ListService
+    private listService: ListService,
+
   ) { }
 
   ngOnInit(): void {
@@ -58,13 +60,7 @@ export class HomeComponent implements OnInit {
       }
     );
 
-    this.taskSubsciption = this.listService.taskSubject.subscribe(
-      (data: any) => {
-        this.taskList = data;
-      }
-    );
     this.listService.getLists();
-    this.listService.getTask();
     // this.listService.emitList();
   }
 
@@ -73,6 +69,7 @@ export class HomeComponent implements OnInit {
     this.listForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.maxLength(30)]],
       id: '',
+      tasks: []
     });
   }
 
@@ -84,9 +81,11 @@ export class HomeComponent implements OnInit {
   onSubmitListForm(){
     this.updateMode = false;
     let uniqueId = Date.now() + this.listOfList.length;
+    let listOfTasks: any[] = [];
     const newList = {
       title: this.listForm.get('title').value,
-      id: uniqueId
+      id: uniqueId,
+      tasks: listOfTasks
     }
     this.listService.createList(newList, this.userId);
     $('#listFormModal').modal('hide');
@@ -94,7 +93,6 @@ export class HomeComponent implements OnInit {
 
   onDeleteList(id){
     $('#deleteListModal').modal('show');
-    this.isListEmpty = this.countTaskOnList(id);
     this.listId = id;
   }
   onConfirmDeleteList() {
@@ -102,87 +100,96 @@ export class HomeComponent implements OnInit {
     $('#deleteListModal').modal('hide');
   }
 
-  countTaskOnList(id){
-    let count = 0;
-    this.taskList.forEach(task => {
-      if (id === task.listId) {
-        count++;
-      }
-    });
-    if (count > 0) {
-      return false;
-    } else { return true }
-  }
-
-
 
   // Tasks
   initTaskForm() {
     this.taskForm = this.formBuilder.group({
       title: ['', Validators.required],
       id: '',
-      listId: ''
     })
   }
 
-  addTask(id) {
+  addTask(fromListId) {
     this.updateMode = false;
     $('#taskFormModal').modal('show');
     this.taskForm.reset();
-    this.listId = id;
+    this.listId = fromListId;
   }
 
   onSubmitTaskForm(){
     let uniqueTaskId = Date.now() + this.listOfList.length;
     const newTask = {
       title: this.taskForm.value.title,
-      id: uniqueTaskId,
-      listId: this.listId
+      id: uniqueTaskId
     };
     if (this.updateMode) {
       const updatedTask = {
         title: this.taskForm.value.title,
-        id: this.taskForm.value.id,
-        listId: this.taskForm.value.listId
+        id: this.taskForm.value.id
       }
-      this.listService.updateListOfTask(updatedTask, this.taskIndexToUpdate);
-    } else { this.listService.createListOfTask(newTask); }
+      this.listService.updateListOfTask(updatedTask, this.taskIndexToUpdate, this.listIdToUpdate, this.userId);
+    } else { this.listService.createListOfTask(newTask, this.listId, this.userId); }
     $('#taskFormModal').modal('hide');
   }
 
-  onEditTask(task) {
+  onEditTask(task, listId) {
     this.updateMode = true;
     $('#taskFormModal').modal('show');
     this.taskForm.get('title').setValue(task.title);
     this.taskForm.get('id').setValue(task.id);
-    this.taskForm.get('listId').setValue(task.listId);
-    const index = this.taskList.findIndex(
-      (taskEl) => {
-        if (taskEl === task) {
-          return true;
-        }
+    let index = '';
+    this.listOfList.forEach(list => {
+      if (list.id === listId) {
+        index = list.tasks.findIndex(
+          (elt) => {
+            if (elt.id === task.id) {
+              return true;
+            }
+          }
+        )
       }
-    );
+    });
     this.taskIndexToUpdate = index;
+    this.listIdToUpdate = listId;
   }
 
-  onDeleteTask(id){
+  onDeleteTask(id, listId){
     $('#deleteTaskModal').modal('show');
-    const index = this.taskList.findIndex(
-      (elt) => {
-        if (elt.id == id){
-          return true;
-        }
+    let index = '';
+    this.listOfList.forEach(list => {
+      if (list.id === listId) {
+        index = list.tasks.findIndex(
+          (elt) => {
+            if (elt.id === id) {
+              return true;
+            }
+          }
+        )
       }
-    );
+    });
     this.taskIndexToRemove = index;
+    this.listIdToDelete = listId;
   }
 
   onConfirmDeleteTask(){
-    this.listService.deleteTask(this.taskIndexToRemove);
-    this.listService.getTask();
+    this.listService.deleteTask(this.taskIndexToRemove, this.listIdToDelete, this.userId);
     $('#deleteTaskModal').modal('hide');
   }
+
+  // Animations
+  onTaskDrop(event: CdkDragDrop<any[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      this.listService.saveAnimation(this.listOfList, this.userId);
+    } else {
+      transferArrayItem(event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex);
+        this.listService.saveAnimation(this.listOfList, this.userId);
+    }
+  }
+
 
 
 }

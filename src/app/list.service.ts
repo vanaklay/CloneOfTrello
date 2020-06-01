@@ -9,16 +9,13 @@ import * as firebase from 'firebase';
 export class ListService {
 
   listOfList: any[] = [];
-  listOfTask: any[] = [];
 
   listSubject = new Subject<any[]>();
-  taskSubject = new Subject<any[]>();
 
   constructor() { }
 
   emitList(){
     this.listSubject.next(this.listOfList);
-    this.taskSubject.next(this.listOfTask);
 
   }
   // lists
@@ -37,7 +34,20 @@ export class ListService {
       (userSession) => {
         if(userSession) {
           firebase.database().ref('/' + userSession.uid).on('value', (data) => {
-            this.listOfList = data.val() ? data.val() : [];
+            if (data.val()) {
+              let tmpList = [];
+              data.val().forEach( elt => {
+                let list = {
+                  id: elt.id,
+                  tasks: elt.tasks ? elt.tasks : [],
+                  title: elt.title
+                };
+                tmpList.push(list);
+              })
+              this.listOfList = tmpList;
+            } else {
+              this.listOfList = [];
+            }
             this.emitList();
           });
         }
@@ -63,36 +73,46 @@ export class ListService {
 
 
   // Tasks
-  saveTasks() {
-    firebase.database().ref('/tasks').set(this.listOfTask);
+
+  createListOfTask(task, listId, userId) {
+    this.listOfList.forEach(list => {
+      if (list.id === listId) {
+        if (list.tasks && list.tasks.length > 0) {
+          list.tasks.push(task);
+        } else {
+          list['tasks'] = [task];
+        }
+        this.saveLists(userId);
+        this.emitList();
+      }
+    })
   }
 
-  getTask() {
-    firebase.database().ref('/tasks').on('value', (data) => {
-      this.listOfTask = data.val() ? data.val() : [];
-      this.emitList();
-    });
+  updateListOfTask(task, index, listId, userId) {
+    this.listOfList.forEach(list => {
+      if (list.id === listId) {
+        list.tasks[index] = task;
+        this.saveLists(userId);
+        this.emitList();
+      }
+    })
   }
 
-  createListOfTask(task) {
-    this.listOfTask.push(task);
-    this.saveTasks();
+  deleteTask(index, listId, userId) {
+    this.listOfList.forEach(list => {
+      if (list.id === listId) {
+        list.tasks.splice(index, 1)
+      }
+    })
+    this.saveLists(userId)
     this.emitList();
   }
 
-  updateListOfTask(task, index) {
-    this.listOfTask[index] = task;
-    this.saveTasks();
-    this.emitList();
-  }
-
-  deleteTask(index) {
-    this.listOfTask.splice(index, 1);
-    this.saveTasks();
-    this.emitList();
-  }
-
-
+  // Animations
+    saveAnimation(list, userId){
+      this.listOfList = list;
+      this.saveLists(userId);
+    }
 
 
 }
