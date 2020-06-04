@@ -18,4 +18,4 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 This is a clone of Trello.
 This application is made with Angular for the front-end and Firebase services for authentication and database.
 
-![Let's go](https://trello-b2971.web.app/)
+[Let's go](https://trello-b2971.web.app/)
